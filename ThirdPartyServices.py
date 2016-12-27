@@ -3,9 +3,10 @@ from flask import Flask
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+@app.route('/v1/')
+def status():
+    return 'Status: Online'
+
 
 
 if __name__ == '__main__':
