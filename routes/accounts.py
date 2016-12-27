@@ -14,9 +14,14 @@ def get_account_info():
 
 @app.route('/v1/account', methods=["POST"])
 def create_account():
-    return return_http_msg(200, message="Account created with success.")
+    if ["Access Token", "Name"] not in request.data:
+        return return_http_msg(400, message="Access Token and Name required.")
+
+    return return_http_msg(200, message={"Information":"Account created with success."})
 
 
 @app.route('/v1/account', methods=["DELETE"])
 def delete_account():
-    return return_http_msg(200, message="Account deleted with success.")
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    return return_http_msg(200, message={"Information":"Account deleted with success."})
