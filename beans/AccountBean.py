@@ -1,18 +1,18 @@
 class AccountBean(object):
-    def new_account(self, name, accessToken, email):
+    def new_account(self, name, accessToken, email, photoLink):
         try:
             from models import User
             from application import db
-            u = User(name=name, accessToken=accessToken, email=email)
+            u = User(name=name, accessToken=accessToken, email=email, photoLink=photoLink)
             db.session.add(u)
             db.session.commit()
             self.result = "Account created."
             return True
         except Exception as e:
-            self.update_account(name, accessToken, email)
+            self.update_account(name, accessToken, email, photoLink)
             return False
 
-    def update_account(self, name, accessToken, email):
+    def update_account(self, name, accessToken, email, photoLink):
         try:
             from models import User
             from application import db
@@ -41,7 +41,7 @@ class AccountBean(object):
         try:
             from models import User
             u = User.query.filter_by(accessToken=self.accessToken).first()
-            self.result = {"email": u.email, "accessToken": u.accessToken, "name": u.name}
+            self.result = {"email": u.email, "accessToken": u.accessToken, "name": u.name, "photoLink": u.photoLink}
             return True
         except Exception as e:
             self.result = "Account doesn't exist."

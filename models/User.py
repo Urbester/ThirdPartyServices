@@ -8,8 +8,10 @@ class User(db.Model):
     email = db.Column(db.String(256), unique=True)
     name = db.Column(db.String(256))
     accessToken = db.Column(db.String(256))
+    photoLink = db.Column(db.String(256))
 
-    def __init__(self, name, accessToken, email):
+    def __init__(self, name, accessToken, email, link):
         self.name = name
         self.email = email
         self.accessToken = accessToken
+        self.link = link
