@@ -19,6 +19,7 @@ class Event(db.Model):
     description = db.Column(db.String(256))
     price = db.Column(db.Integer)
     owner = db.Column(db.relationship('User'))
+    accessToken = db.Column(db.String(256))
 
     def __init__(self, id, title, startDate, endDate, local, acceptedGuests,
                  rejectedInvitations, pendingInvitations, description, price, owner, accessToken):
@@ -33,3 +34,5 @@ class Event(db.Model):
         self.description = description
         self.price = price
         self.owner = owner
+        self.accessToken = accessToken;
+
