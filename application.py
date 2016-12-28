@@ -9,7 +9,7 @@ app = Flask(__name__)
 application = Flask(__name__)
 CORS(application)
 
-application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@127.0.0.1:3306/mobilauto'
+application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@127.0.0.1:3306/thirdparty'
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(application, session_options={'autocommit': False})
 
