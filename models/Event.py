@@ -6,8 +6,8 @@ class Event(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(256))
-    startDate = db.Column(date)
-    endDate = db.Column(date)
+    startDate = db.Column(db.DateTime)
+    endDate = db.Column(db.DateTime)
     local = db.Column(db.String(256))
     # One to Many
     acceptedGuests = db.relationship('User')
