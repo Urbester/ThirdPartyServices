@@ -1,11 +1,11 @@
 from flask import request
 
 from application import app
-from beans.AccountBean import AccountBean
+from beans import AccountBean
 from lib.utils import return_http_msg
 
 
-@app.route('/v1/account', methods=["GET"])
+@app.route('/v1/account/', methods=["GET"])
 def get_account_info():
     # X-Auth-Token Needed
     if "X-Auth-Token" not in request.headers:
@@ -17,7 +17,7 @@ def get_account_info():
         return return_http_msg(400, message=bean.result)
 
 
-@app.route('/v1/account', methods=["POST"])
+@app.route('/v1/account/', methods=["POST"])
 def create_account():
     if ["AccessToken", "Name", "Email"] not in request.data:
         return return_http_msg(400, message="AccessToken, Name and Email required.")

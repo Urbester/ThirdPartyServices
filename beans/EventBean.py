@@ -1,36 +1,29 @@
 class EventBean(object):
-    def new_event(self, title, startDate, endDate, local, acceptedGuests,
-                  rejectedInvitations, pendingInvitations, description, price, owner):
+    def new_event(self, title, startDate, endDate, local, description, price, owner, accessToken):
         try:
             from models import Event
+            from models import User
             from application import db
             event = Event(title=title, startDate=startDate, endDate=endDate,
-                          local=local, acceptedGuests=acceptedGuests,
-                          rejectedInvitations=rejectedInvitations,
-                          pendingInvitations=pendingInvitations,
-                          description=description, price=price, owner=owner)
+                          local=local, description=description, price=price,owner=owner)
             db.session.add(event)
             db.session.commit()
             self.result = "Event created."
             return True
         except Exception as event:
-            self.update_event(title, startDate, endDate, local, acceptedGuests,
-                              rejectedInvitations, pendingInvitations, description, price, owner)
+            self.result = "Error creating event."
             return False
 
-    def update_event(self, id, title, startDate, endDate, local, acceptedGuests,
-                     rejectedInvitations, pendingInvitations, description, price):
+    def update_event(self, id, title, startDate, endDate, local,
+                      description, price, owner):
         try:
             from models import Event
             from application import db
-            event = Event.query.filter_by(id=self.id).first()
+            event = Event.query.filter_by(id=self.id,owner=owner).first()
             event.title = title
             event.startDate = startDate
             event.endDate = endDate
             event.local = local
-            event.acceptedGuests = acceptedGuests
-            event.rejectedInvitations = rejectedInvitations
-            event.pendingInvitations = pendingInvitations
             event.description = description
             event.price = price
             db.session.commit()
@@ -39,11 +32,11 @@ class EventBean(object):
             self.result = "Update Error"
             return False
 
-    def delete_event(self, id):
+    def delete_event(self, id, owner):
         try:
             from models import Event
             from application import db
-            event = Event.query.filter_by(id=self.id).first()
+            event = Event.query.filter_by(id=self.id,owner=owner).first()
             db.session.delete(event)
             db.session.commit()
             self.result = "Event was deleted."

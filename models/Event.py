@@ -1,6 +1,7 @@
 from application import db
 from datetime import date
 
+
 class Event(db.Model):
     __tablename__ = "Event"
 
@@ -17,12 +18,11 @@ class Event(db.Model):
     pendingInvitations = db.relationship('User')
     description = db.Column(db.String(256))
     price = db.Column(db.Integer)
-    owner = db.Column(db.relationship('User'))
+    host = db.Column(db.relationship('User'))
 
 
-
-    def __init__(self, id,title, startDate, endDate, local, acceptedGuests,
-                 rejectedInvitations, pendingInvitations, description, price, owner  ):
+    def __init__(self, id, title, startDate, endDate, local, acceptedGuests,
+                 rejectedInvitations, pendingInvitations, description, price, owner):
         self.id = id
         self.title = title
         self.startDate = startDate
@@ -33,5 +33,6 @@ class Event(db.Model):
         self.pendingInvitations = pendingInvitations
         self.description = description
         self.price = price
-        self.owner = owner
+        self.host = owner
+
 

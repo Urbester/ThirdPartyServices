@@ -1,23 +1,24 @@
 from flask import Flask
-from flask.ext.cors import CORS
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
+CORS(app)
 
-application = Flask(__name__)
-CORS(application)
-
-application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@127.0.0.1:3306/thirdparty'
-application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(application, session_options={'autocommit': False})
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@127.0.0.1:3306/thirdparty'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app, session_options={'autocommit': False})
 
 db.engine.dialect.supports_sane_rowcount = db.engine.dialect.supports_sane_multi_rowcount = False
+
 
 @app.route('/v1/')
 def status():
     return 'Status: Online'
 
 from routes.accounts import *
+from routes.events import *
 
 if __name__ == '__main__':
     try:
