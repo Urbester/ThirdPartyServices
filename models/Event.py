@@ -21,8 +21,9 @@ class Event(db.Model):
 
 
 
-    def __init__(self, title, startDate, endDate, local, acceptedGuests,
+    def __init__(self, id,title, startDate, endDate, local, acceptedGuests,
                  rejectedInvitations, pendingInvitations, description, price, owner  ):
+        self.id = id
         self.title = title
         self.startDate = startDate
         self.endDate = endDate
