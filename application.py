@@ -2,8 +2,6 @@ from flask import Flask
 from flask.ext.cors import CORS
 from flask.ext.sqlalchemy import SQLAlchemy
 
-from routes import *
-
 app = Flask(__name__)
 
 application = Flask(__name__)
@@ -19,6 +17,7 @@ db.engine.dialect.supports_sane_rowcount = db.engine.dialect.supports_sane_multi
 def status():
     return 'Status: Online'
 
+from routes.accounts import *
 
 if __name__ == '__main__':
     try:
