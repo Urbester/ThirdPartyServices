@@ -19,10 +19,10 @@ def get_account_info():
 
 @app.route('/v1/account/', methods=["POST"])
 def create_account():
-    if ["AccessToken", "Name", "Email"] not in request.data:
+    if ["AccessToken", "Name", "Email","PhotoLink"] not in request.data:
         return return_http_msg(400, message="AccessToken, Name and Email required.")
     bean = AccountBean()
-    if bean.new_account(request.data["Name"], request.data["AccessToken"], request.data["Email"]):
+    if bean.new_account(request.data["Name"], request.data["AccessToken"], request.data["Email"],request.data["PhotoLink"]):
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
