@@ -60,3 +60,17 @@ def update_event():
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
+
+@app.route('/v1/event/accept')
+def accept_event():
+    if ["Id"] not in request.data:
+        return return_http_msg(400, message="Expected Id")
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    owner = User.query.filter_by(accessToken=request.data["X-Auth-Token"])
+    bean = EventBean()
+    if bean.get_event(request.data["Id"]):
+        bean.result.accepted_guests.append(owner)
+        return return_http_msg(200, message=bean.result)
+    else:
+        return return_http_msg(400, message=bean.result)
