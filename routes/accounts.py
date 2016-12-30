@@ -8,7 +8,6 @@ from lib.utils import return_http_msg
 @app.route('/v1/account', methods=["GET"])
 def get_account_info():
     # X-Auth-Token Needed
-
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
     bean = AccountBean()
