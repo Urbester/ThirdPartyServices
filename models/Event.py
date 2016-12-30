@@ -40,11 +40,12 @@ class Event(db.Model):
     pending = db.relationship("User", secondary=User_Pending_Event, backref=db.backref('pending_event', lazy='dynamic'))
 
 
-    def __init__(self, title, startDate, endDate, local, description, price, owner):
+    def __init__(self, title, startDate, endDate, local, description, price, owner, public):
         self.title = title
         self.startDate = startDate
         self.endDate = endDate
         self.local = local
         self.description = description
         self.price = price
+        self.isPublic = public
         self.host = owner

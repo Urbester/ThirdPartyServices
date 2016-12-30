@@ -10,17 +10,23 @@ from lib.utils import return_http_msg
 @app.route('/v1/event', methods=["POST"])
 def create_event():
     data = request.get_json()
-    if not set(["Title", "StartDate", "EndDate", "Local", "Description", "Price"]).issubset(data.keys()):
-        return return_http_msg(400, message="Expected Title, StartDate, EndDate, Local, Description, Price")
+    if not set(["Title", "StartDate", "EndDate", "Local", "Description", "Price", "Public"]).issubset(data.keys()):
+        return return_http_msg(400, message="Expected Title, StartDate, EndDate, Local, Description, Price, Public")
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
     owner = AccountBean()
     if not owner.get_account(request.headers["X-Auth-Token"]):
         return return_http_msg(400, message="Invalid AccessToken")
     bean = EventBean()
+
+    if data["Public"] == "true":
+        data["Public"] = True
+    else:
+        data["Public"] = False
+
     if bean.new_event(data["Title"], data["StartDate"], data["EndDate"],
                       data["Local"], data["Description"], data["Price"],
-                      owner.get_account(request.headers["X-Auth-Token"])):
+                      owner.get_account(request.headers["X-Auth-Token"]), data["Public"]):
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
