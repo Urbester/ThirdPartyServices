@@ -43,7 +43,8 @@ class Event(db.Model):
                                backref=db.backref('rejected_event', lazy='dynamic'))
     invited = db.relationship("User", secondary=User_InvitedTo_Event,
                               backref=db.backref('invited_event', lazy='dynamic'))
-    pending = db.relationship("User", secondary=User_Pending_Event, backref=db.backref('pending_event', lazy='dynamic'))
+    pending = db.relationship("User", secondary=User_Pending_Event,
+                              backref=db.backref('pending_event', lazy='dynamic'))
 
     def __init__(self, title, startDate, endDate, local, description, price, owner, public, URL=None):
         self.title = title

@@ -10,8 +10,10 @@ from lib.utils import return_http_msg
 @app.route('/v1/event', methods=["POST"])
 def create_event():
     data = request.get_json()
-    if not set(["Title", "StartDate", "EndDate", "Local", "Description", "Price", "Public", "URL"]).issubset(data.keys()):
-        return return_http_msg(400, message="Expected Title, StartDate, EndDate, Local, Description, Price, Public, URL")
+    if not set(["Title", "StartDate", "EndDate", "Local", "Description", "Price", "Public", "URL"]).issubset(
+            data.keys()):
+        return return_http_msg(400,
+                               message="Expected Title, StartDate, EndDate, Local, Description, Price, Public, URL")
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
     owner = AccountBean()
@@ -24,9 +26,10 @@ def create_event():
     else:
         data["Public"] = False
 
+    host = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
     if bean.new_event(data["Title"], data["StartDate"], data["EndDate"],
                       data["Local"], data["Description"], data["Price"],
-                      owner.get_account(request.headers["X-Auth-Token"]), data["Public"], data["URL"]):
+                      host.id, data["Public"], data["URL"]):
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
@@ -118,7 +121,7 @@ def invite_to_event():
     else:
         return return_http_msg(400, message=bean.result)
 
-
+# METHOD FOR OWNER TO REJECT PENDING USERS
 @app.route('/v1/event/reject', methods=['POST'])
 def reject_user_from_event():
     if "X-Auth-Token" not in request.headers:
@@ -148,6 +151,7 @@ def ask_to_join_party():
     else:
         return return_http_msg(400, message=bean.result)
 
+
 #################################################################
 
 # GET PUBLIC EVENT LIST
@@ -156,10 +160,90 @@ def get_event_lists():
     # X-Auth-Token Needed
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_event_list(user)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
+# GET HOSTING EVENTS
+@app.route('/v1/event/list/hosting', methods=['GET'])
+def get_hostting_event_lists():
+    # X-Auth-Token Needed
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
     user = AccountBean()
     if user.get_account(accessToken=request.headers["X-Auth-Token"]):
         event = EventBean()
-        event.get_event_list()
+        event.get_hosting_event_list(user.get_account(accessToken=request.headers["X-Auth-Token"]))
         return return_http_msg(200, message=event.result)
     else:
         return return_http_msg(400, message=user.result)
+
+
+# GET ACCEPTED EVENTS
+@app.route('/v1/event/list/accepted', methods=['GET'])
+def get_accepted_event_lists():
+    # X-Auth-Token Needed
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_accepted_event_list(user)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
+# GET REJECTED EVENTS
+@app.route('/v1/event/list/rejected', methods=['GET'])
+def get_rejected_event_lists():
+    # X-Auth-Token Needed
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_rejected_event_list(user)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
+# GET PENDING EVENTS
+@app.route('/v1/event/list/pending', methods=['GET'])
+def get_pending_event_lists():
+    # X-Auth-Token Needed
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_pending_event_list(user)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
+# GET INVITED EVENTS
+@app.route('/v1/event/list/invited', methods=['GET'])
+def get_invited_event_lists():
+    # X-Auth-Token Needed
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_invited_event_list(user)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
