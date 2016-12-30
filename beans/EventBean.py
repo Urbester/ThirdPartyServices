@@ -71,7 +71,16 @@ class EventBean(object):
             from application import db
             event = Event.query.filter_by(id=event_id).first()
             event.accepted.append(user)
+            try:
+                event.invited.remove(user)
+            except Exception as e:
+                try:
+                    event.pending.remove(user)
+                except:
+                    self.result = "ERROR"
+
             db.session.commit()
+            self.result = "Accepted Event"
             return True
         except Exception as exception:
             self.result = "ERROR"
@@ -84,6 +93,7 @@ class EventBean(object):
             event = Event.query.filter_by(id=event_id).first()
             event.rejected.append(user)
             db.session.commit()
+            self.result = "Rejected Event"
             return True
         except Exception as exception:
             self.result = "ERROR"
@@ -95,9 +105,10 @@ class EventBean(object):
             from application import db
             event = Event.query.filter_by(id=event_id, host=owner.id).first()
             for i in invite_list:
-                if User.query.filter_by(email=invite_list[i]).first() is not None:
-                    event.invited.append(User.query.filter_by(email=invite_list[i]).first())
+                if User.query.filter_by(email=i).first() is not None:
+                    event.invited.append(User.query.filter_by(email=i).first())
             db.session.commit()
+            self.result = "Invited User"
             return True
         except Exception as exception:
             self.result = "ERROR"
@@ -112,6 +123,7 @@ class EventBean(object):
                 if User.query.filter_by(email=invite_list[i]).first() is not None:
                     event.rejected.append(User.query.filter_by(email=invite_list[i]).first())
             db.session.commit()
+            self.result = "Rejected User"
             return True
         except Exception as exception:
             self.result = "ERROR"
@@ -124,15 +136,101 @@ class EventBean(object):
             event = Event.query.filter_by(id=event_id, isPublic=True).first()
             event.pending.append(User.query.filter_by(email=owner.email).first())
             db.session.commit()
+            self.result = "Asked to event"
             return True
         except Exception as exception:
             self.result = "ERROR"
             return False
 
-    def get_event_list(self):
+    def get_event_list(self, user):
         try:
             from models import Event
-            event_set = Event.query.filter_by(isPublic=True)
+            event_set = Event.query.filter(Event.isPublic == True, Event.host != user.id)
+            event_list = []
+            for event in event_set:
+                event_list.append({"id": event.id, "title": event.title,
+                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "local": event.local, "description": event.description, "price": event.price,
+                                   "host": event.host, "URL": event.URL})
+            self.result = event_list
+            return True
+        except Exception as exception:
+            self.result = "Event doesn't exist."
+            return False
+
+    def get_hosting_event_list(self, user):
+        try:
+            from models import Event, User
+            event_set = User.query.filter_by(id=user.id).first().hosting
+            event_list = []
+            for event in event_set:
+                event_list.append({"id": event.id, "title": event.title,
+                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "local": event.local, "description": event.description, "price": event.price,
+                                   "host": event.host, "URL": event.URL})
+            self.result = event_list
+            return True
+        except Exception as exception:
+            self.result = "Event doesn't exist."
+            return False
+
+    def get_accepted_event_list(self, user):
+        try:
+            from models import Event, User
+            event_set = User.query.filter_by(id=user.id).first().accepted
+            event_list = []
+            for event in event_set:
+                event_list.append({"id": event.id, "title": event.title,
+                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "local": event.local, "description": event.description, "price": event.price,
+                                   "host": event.host, "URL": event.URL})
+            self.result = event_list
+            return True
+        except Exception as exception:
+            self.result = "Event doesn't exist."
+            return False
+
+    def get_rejected_event_list(self, user):
+        try:
+            from models import Event, User
+            event_set = User.query.filter_by(id=user.id).first().rejected
+            event_list = []
+            for event in event_set:
+                event_list.append({"id": event.id, "title": event.title,
+                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "local": event.local, "description": event.description, "price": event.price,
+                                   "host": event.host, "URL": event.URL})
+            self.result = event_list
+            return True
+        except Exception as exception:
+            self.result = "Event doesn't exist."
+            return False
+
+    def get_pending_event_list(self, user):
+        try:
+            from models import Event, User
+            event_set = User.query.filter_by(id=user.id).first().pending
+            event_list = []
+            for event in event_set:
+                event_list.append({"id": event.id, "title": event.title,
+                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "local": event.local, "description": event.description, "price": event.price,
+                                   "host": event.host, "URL": event.URL})
+            self.result = event_list
+            return True
+        except Exception as exception:
+            self.result = "Event doesn't exist."
+            return False
+
+    def get_invited_event_list(self, user):
+        try:
+            from models import Event, User
+            event_set = User.query.filter_by(id=user.id).first().invited
             event_list = []
             for event in event_set:
                 event_list.append({"id": event.id, "title": event.title,
