@@ -6,7 +6,7 @@ class EventBean(object):
             from application import db
             if URL == "":
                 event = Event(title=title, startDate=startDate, endDate=endDate,
-                          local=local, description=description, price=price, owner=owner, public=public)
+                              local=local, description=description, price=price, owner=owner, public=public)
             else:
                 event = Event(title=title, startDate=startDate, endDate=endDate,
                               local=local, description=description, price=price, owner=owner, public=public, URL=URL)
@@ -127,4 +127,21 @@ class EventBean(object):
             return True
         except Exception as exception:
             self.result = "ERROR"
+            return False
+
+    def get_event_list(self):
+        try:
+            from models import Event
+            event_set = Event.query.filter_by(isPublic=True)
+            event_list = []
+            for event in event_set:
+                event_list.append({"id": event.id, "title": event.title,
+                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                                   "local": event.local, "description": event.description, "price": event.price,
+                                   "host": event.host, "URL": event.URL})
+            self.result = event_list
+            return True
+        except Exception as exception:
+            self.result = "Event doesn't exist."
             return False

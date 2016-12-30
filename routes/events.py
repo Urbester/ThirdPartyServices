@@ -150,4 +150,16 @@ def ask_to_join_party():
 
 #################################################################
 
-#
+# GET PUBLIC EVENT LIST
+@app.route('/v1/event/list/public', methods=["GET"])
+def get_event_lists():
+    # X-Auth-Token Needed
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    user = AccountBean()
+    if user.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        event.get_event_list()
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=user.result)
