@@ -1,11 +1,15 @@
 class EventBean(object):
-    def new_event(self, title, startDate, endDate, local, description, price, owner, public):
+    def new_event(self, title, startDate, endDate, local, description, price, owner, public, URL):
         try:
             from models import Event
             from models import User
             from application import db
-            event = Event(title=title, startDate=startDate, endDate=endDate,
+            if URL == "":
+                event = Event(title=title, startDate=startDate, endDate=endDate,
                           local=local, description=description, price=price, owner=owner, public=public)
+            else:
+                event = Event(title=title, startDate=startDate, endDate=endDate,
+                              local=local, description=description, price=price, owner=owner, public=public, URL=URL)
             db.session.add(event)
             db.session.commit()
             self.result = "Event created."
