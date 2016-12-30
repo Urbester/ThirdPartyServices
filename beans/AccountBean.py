@@ -1,4 +1,8 @@
 class AccountBean(object):
+
+    def __init__(self):
+        pass
+
     def new_account(self, name, accessToken, email, photoLink):
         try:
             from models import User
@@ -28,7 +32,7 @@ class AccountBean(object):
         try:
             from models import User
             from application import db
-            u = User.query.filter_by(accessToken=self.accessToken).first()
+            u = User.query.filter_by(accessToken=accessToken).first()
             db.session.delete(u)
             db.session.commit()
             self.result = "Account removed."
@@ -40,7 +44,7 @@ class AccountBean(object):
     def get_account(self, accessToken):
         try:
             from models import User
-            u = User.query.filter_by(accessToken=self.accessToken).first()
+            u = User.query.filter_by(accessToken=accessToken).first()
             self.result = {"email": u.email, "accessToken": u.accessToken, "name": u.name, "photoLink": u.photoLink}
             return True
         except Exception as e:
