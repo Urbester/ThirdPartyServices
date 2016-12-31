@@ -61,7 +61,7 @@ def delete_event():
     else:
         return return_http_msg(400, message=bean.result)
 
-
+# NICE TO HAVE FEATURE - UNTESTED
 @app.route('/v1/event', methods=["PUT"])
 def update_event():
     if ["Id", "Title", "StartDate", "EndDate", "Local", "Description", "Price"] not in request.data:
@@ -176,13 +176,14 @@ def get_hostting_event_lists():
     # X-Auth-Token Needed
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
-    user = AccountBean()
-    if user.get_account(accessToken=request.headers["X-Auth-Token"]):
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
         event = EventBean()
-        event.get_hosting_event_list(user.get_account(accessToken=request.headers["X-Auth-Token"]))
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_hosting_event_list(user)
         return return_http_msg(200, message=event.result)
     else:
-        return return_http_msg(400, message=user.result)
+        return return_http_msg(400, message=bean.result)
 
 
 # GET ACCEPTED EVENTS
