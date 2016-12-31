@@ -11,7 +11,7 @@ from lib.utils import return_http_msg
 def create_event():
     data = request.get_json()
     if not set(
-            ["Title", "Description", "StartDate", "EndDate", "Local", "Price", "Public", "maxGuests", "URL"]).issubset(
+            ["Title", "Description", "StartDate", "EndDate", "Local", "Price", "Public", "MaxGuests", "URL"]).issubset(
             data.keys()):
         return return_http_msg(400,
                                message="Expected Title, StartDate, EndDate, Local, Description, Price, Public, maxGuests, URL")
@@ -36,7 +36,7 @@ def create_event():
                       data["Price"],
                       host.id,
                       data["Public"],
-                      data["maxGuests"],
+                      data["MaxGuests"],
                       data["URL"]):
         return return_http_msg(200, message=bean.result)
     else:
