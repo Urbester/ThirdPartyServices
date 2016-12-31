@@ -162,7 +162,7 @@ class EventBean(object):
     def get_hosting_event_list(self, user):
         try:
             from models import Event, User
-            event_set = User.query.filter_by(id=user.id).first().hosting
+            event_set = Event.query.filter_by(host=user.id)
             event_list = []
             for event in event_set:
                 event_list.append({"id": event.id, "title": event.title,
