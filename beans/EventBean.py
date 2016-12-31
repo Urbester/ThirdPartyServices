@@ -165,11 +165,16 @@ class EventBean(object):
             event_set = Event.query.filter_by(host=user.id)
             event_list = []
             for event in event_set:
-                event_list.append({"id": event.id, "title": event.title,
+                event_list.append({"id": event.id,
+                                   "title": event.title,
                                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
                                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "local": event.local, "description": event.description, "price": event.price,
-                                   "host": event.host, "URL": event.URL})
+                                   "local": event.local,
+                                   "description": event.description,
+                                   "price": event.price,
+                                   "host": user.name,
+                                   "URL": event.URL})
+
             self.result = event_list
             return True
         except Exception as exception:
