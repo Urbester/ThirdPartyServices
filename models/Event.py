@@ -53,8 +53,8 @@ class Event(db.Model):
         self.endDate = endDate
         self.local = local
         self.description = description
-        self.price = price
+        self.price = int(price)
         self.isPublic = public
         self.host = owner
-        self.maxGuests = maxGuests
+        self.maxGuests = int(maxGuests)
         self.URL = URL

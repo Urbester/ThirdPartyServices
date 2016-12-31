@@ -27,6 +27,9 @@ def create_event():
     else:
         data["Public"] = False
 
+
+
+
     host = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
     if bean.new_event(data["Title"],
                       data["StartDate"],
