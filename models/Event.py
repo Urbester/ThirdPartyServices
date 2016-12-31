@@ -34,6 +34,7 @@ class Event(db.Model):
     price = db.Column("price", db.Integer)
     host = db.Column("host", db.ForeignKey('User.id'))
     isPublic = db.Column("isPublic", db.Boolean, default=False)
+    maxGuests = db.Column("maxGuests", db.Integer)
     URL = db.Column("URL", db.String(512), default="http://lorempixel.com/400/200/nightlife/")
 
     # Relations
@@ -46,7 +47,7 @@ class Event(db.Model):
     pending = db.relationship("User", secondary=User_Pending_Event,
                               backref=db.backref('pending_event', lazy='dynamic'))
 
-    def __init__(self, title, startDate, endDate, local, description, price, owner, public, URL=None):
+    def __init__(self, title, startDate, endDate, local, description, price, owner, public, maxGuests, URL=None):
         self.title = title
         self.startDate = startDate
         self.endDate = endDate
@@ -55,4 +56,5 @@ class Event(db.Model):
         self.price = price
         self.isPublic = public
         self.host = owner
+        self.maxGuests = maxGuests
         self.URL = URL

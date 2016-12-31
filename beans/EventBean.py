@@ -53,13 +53,25 @@ class EventBean(object):
 
     def get_event(self, id):
         try:
-            from models import Event
+            from models import Event, User
             event = Event.query.filter_by(id=id).first()
-            self.result = {"id": event.id, "title": event.title,
-                           "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
-                           "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                           "local": event.local, "description": event.description, "price": event.price,
-                           "host": event.host}
+            accepted_users = Event.query.filter_by(id=id).first().accepted
+            host_user = User.query.filter_by(id=event.host).first()
+            self.result = {
+                "id": event.id,
+                "title": event.title,
+                "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                "local": event.local,
+                "description": event.description,
+                "price": event.price,
+                "host_name": host_user.name,
+                "host_email": host_user.email,
+                "host_URL": host_user.photoLink,
+                "maxGuests": event.maxGuests,
+                "slotsLeft": event.maxGuests - len(accepted_users),
+                "URL": event.URL
+            }
             return True
         except Exception as exception:
             self.result = "Event doesn't exist."
@@ -144,15 +156,27 @@ class EventBean(object):
 
     def get_event_list(self, user):
         try:
-            from models import Event
+            from models import Event, User
             event_set = Event.query.filter(Event.isPublic == True, Event.host != user.id)
             event_list = []
             for event in event_set:
-                event_list.append({"id": event.id, "title": event.title,
-                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "local": event.local, "description": event.description, "price": event.price,
-                                   "host": event.host, "URL": event.URL})
+                host_user = User.query.filter_by(id=event.host).first()
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                event_list.append({
+                    "id": event.id,
+                    "title": event.title,
+                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "local": event.local,
+                    "description": event.description,
+                    "price": event.price,
+                    "host_name": host_user.name,
+                    "host_email": host_user.email,
+                    "host_URL": host_user.photoLink,
+                    "maxGuests": event.maxGuests,
+                    "slotsLeft": event.maxGuests - len(accepted_users),
+                    "URL": event.URL
+                })
             self.result = event_list
             return True
         except Exception as exception:
@@ -165,16 +189,22 @@ class EventBean(object):
             event_set = Event.query.filter_by(host=user.id)
             event_list = []
             for event in event_set:
-                event_list.append({"id": event.id,
-                                   "title": event.title,
-                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "local": event.local,
-                                   "description": event.description,
-                                   "price": event.price,
-                                   "host": user.name,
-                                   "URL": event.URL})
-
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                event_list.append({
+                    "id": event.id,
+                    "title": event.title,
+                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "local": event.local,
+                    "description": event.description,
+                    "price": event.price,
+                    "host_name": user.name,
+                    "host_email": user.email,
+                    "host_URL": user.photoLink,
+                    "maxGuests": event.maxGuests,
+                    "slotsLeft": event.maxGuests - len(accepted_users),
+                    "URL": event.URL
+                })
             self.result = event_list
             return True
         except Exception as exception:
@@ -187,11 +217,22 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().accepted
             event_list = []
             for event in event_set:
-                event_list.append({"id": event.id, "title": event.title,
-                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "local": event.local, "description": event.description, "price": event.price,
-                                   "host": event.host, "URL": event.URL})
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                event_list.append({
+                    "id": event.id,
+                    "title": event.title,
+                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "local": event.local,
+                    "description": event.description,
+                    "price": event.price,
+                    "host_name": user.name,
+                    "host_email": user.email,
+                    "host_URL": user.photoLink,
+                    "maxGuests": event.maxGuests,
+                    "slotsLeft": event.maxGuests - len(accepted_users),
+                    "URL": event.URL
+                })
             self.result = event_list
             return True
         except Exception as exception:
@@ -204,11 +245,22 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().rejected
             event_list = []
             for event in event_set:
-                event_list.append({"id": event.id, "title": event.title,
-                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "local": event.local, "description": event.description, "price": event.price,
-                                   "host": event.host, "URL": event.URL})
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                event_list.append({
+                    "id": event.id,
+                    "title": event.title,
+                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "local": event.local,
+                    "description": event.description,
+                    "price": event.price,
+                    "host_name": user.name,
+                    "host_email": user.email,
+                    "host_URL": user.photoLink,
+                    "maxGuests": event.maxGuests,
+                    "slotsLeft": event.maxGuests - len(accepted_users),
+                    "URL": event.URL
+                })
             self.result = event_list
             return True
         except Exception as exception:
@@ -221,11 +273,22 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().pending
             event_list = []
             for event in event_set:
-                event_list.append({"id": event.id, "title": event.title,
-                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "local": event.local, "description": event.description, "price": event.price,
-                                   "host": event.host, "URL": event.URL})
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                event_list.append({
+                    "id": event.id,
+                    "title": event.title,
+                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "local": event.local,
+                    "description": event.description,
+                    "price": event.price,
+                    "host_name": user.name,
+                    "host_email": user.email,
+                    "host_URL": user.photoLink,
+                    "maxGuests": event.maxGuests,
+                    "slotsLeft": event.maxGuests - len(accepted_users),
+                    "URL": event.URL
+                })
             self.result = event_list
             return True
         except Exception as exception:
@@ -238,11 +301,22 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().invited
             event_list = []
             for event in event_set:
-                event_list.append({"id": event.id, "title": event.title,
-                                   "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
-                                   "local": event.local, "description": event.description, "price": event.price,
-                                   "host": event.host, "URL": event.URL})
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                event_list.append({
+                    "id": event.id,
+                    "title": event.title,
+                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "local": event.local,
+                    "description": event.description,
+                    "price": event.price,
+                    "host_name": user.name,
+                    "host_email": user.email,
+                    "host_URL": user.photoLink,
+                    "maxGuests": event.maxGuests,
+                    "slotsLeft": event.maxGuests - len(accepted_users),
+                    "URL": event.URL
+                })
             self.result = event_list
             return True
         except Exception as exception:

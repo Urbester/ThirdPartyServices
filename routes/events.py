@@ -61,6 +61,7 @@ def delete_event():
     else:
         return return_http_msg(400, message=bean.result)
 
+
 # NICE TO HAVE FEATURE - UNTESTED
 @app.route('/v1/event', methods=["PUT"])
 def update_event():
@@ -120,6 +121,7 @@ def invite_to_event():
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
+
 
 # METHOD FOR OWNER TO REJECT PENDING USERS
 @app.route('/v1/event/reject', methods=['POST'])
