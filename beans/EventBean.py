@@ -578,3 +578,63 @@ class EventBean(object):
         except Exception as exception:
             self.result = "Event doesn't exist."
             return False
+
+    def get_user_lists(self, event_id):
+        try:
+            from models import Event, User
+
+            acceptedUsers = Event.query.filter_by(id=event_id).first().accepted
+            rejectedUsers = Event.query.filter_by(id=event_id).first().rejected
+            invitedUsers = Event.query.filter_by(id=event_id).first().invited
+            pendingUsers = Event.query.filter_by(id=event_id).first().pending
+
+            acceptedList = []
+            rejectedList = []
+            invitedList = []
+            pendingList = []
+
+            for user in acceptedUsers:
+                new_user = {
+                    "name":user.name,
+                    "email":user.email,
+                    "pic":user.photoLink
+                }
+                acceptedList.append(new_user)
+
+            for user in rejectedUsers:
+                new_user = {
+                    "name":user.name,
+                    "email":user.email,
+                    "pic":user.photoLink
+                }
+                rejectedList.append(new_user)
+
+            for user in invitedUsers:
+                new_user = {
+                    "name":user.name,
+                    "email":user.email,
+                    "pic":user.photoLink
+                }
+                invitedList.append(new_user)
+
+            for user in pendingUsers:
+                new_user = {
+                    "name":user.name,
+                    "email":user.email,
+                    "pic":user.photoLink
+                }
+                pendingList.append(new_user)
+
+            complete_list = {
+                "usersAccepted":acceptedList,
+                "usersInvited":invitedList,
+                "usersPending":pendingList,
+                "usersRejected":rejectedList
+            }
+
+            self.result = complete_list
+            return True
+
+        except Exception as exception:
+            self.result = "ERROR getting lists"
+            return False
