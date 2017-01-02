@@ -579,6 +579,75 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
+    def get_upcoming_events(self, user):
+        try:
+            from models import Event, User
+            from datetime import datetime
+
+            event_set = Event.query.filter(Event.startDate > datetime.now())
+
+            event_list = []
+            for event in event_set:
+
+                isHosting = "false"
+                isAccepted = "false"
+                isPending = "false"
+                isRejected = "false"
+                isInvited = "false"
+
+                # check if is hosting the event
+                host_user = User.query.filter_by(id=event.host).first()
+                if host_user.accessToken == user.accessToken:
+                    isHosting = "true"
+
+                # check if is in accepted list of event
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                if user in accepted_users:
+                    isAccepted = "true"
+
+                # check if is pending list of event
+                pending_users = Event.query.filter_by(id=event.id).first().pending
+                if user in pending_users:
+                    isPending = "true"
+
+                # check if is in rejected list of event
+                rejected = Event.query.filter_by(id=event.id).first().rejected
+                if user in rejected:
+                    isRejected = "true"
+
+                # check if is invited list of event
+                invited = Event.query.filter_by(id=event.id).first().invited
+                if user in invited:
+                    isInvited = "true"
+
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                event_list.append({
+                    "id": event.id,
+                    "title": event.title,
+                    "startDate": event.startDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "endDate": event.endDate.strftime("%Y-%m-%d %H:%M:%S"),
+                    "local": event.local,
+                    "description": event.description,
+                    "price": event.price,
+                    "host_name": host_user.name,
+                    "host_email": host_user.email,
+                    "host_URL": host_user.photoLink,
+                    "maxGuests": event.maxGuests,
+                    "isHosting": isHosting,
+                    "isPending": isPending,
+                    "isInvited": isInvited,
+                    "isRejected": isRejected,
+                    "isAccepted": isAccepted,
+                    "slotsLeft": event.maxGuests - len(accepted_users),
+                    "URL": event.URL
+                })
+            self.result = event_list
+            return True
+
+        except Exception as exception:
+            self.result = "Event doesn't exist."
+            return False
+
     def get_user_lists(self, event_id):
         try:
             from models import Event, User
@@ -595,41 +664,41 @@ class EventBean(object):
 
             for user in acceptedUsers:
                 new_user = {
-                    "name":user.name,
-                    "email":user.email,
-                    "pic":user.photoLink
+                    "name": user.name,
+                    "email": user.email,
+                    "pic": user.photoLink
                 }
                 acceptedList.append(new_user)
 
             for user in rejectedUsers:
                 new_user = {
-                    "name":user.name,
-                    "email":user.email,
-                    "pic":user.photoLink
+                    "name": user.name,
+                    "email": user.email,
+                    "pic": user.photoLink
                 }
                 rejectedList.append(new_user)
 
             for user in invitedUsers:
                 new_user = {
-                    "name":user.name,
-                    "email":user.email,
-                    "pic":user.photoLink
+                    "name": user.name,
+                    "email": user.email,
+                    "pic": user.photoLink
                 }
                 invitedList.append(new_user)
 
             for user in pendingUsers:
                 new_user = {
-                    "name":user.name,
-                    "email":user.email,
-                    "pic":user.photoLink
+                    "name": user.name,
+                    "email": user.email,
+                    "pic": user.photoLink
                 }
                 pendingList.append(new_user)
 
             complete_list = {
-                "usersAccepted":acceptedList,
-                "usersInvited":invitedList,
-                "usersPending":pendingList,
-                "usersRejected":rejectedList
+                "usersAccepted": acceptedList,
+                "usersInvited": invitedList,
+                "usersPending": pendingList,
+                "usersRejected": rejectedList
             }
 
             self.result = complete_list
@@ -642,8 +711,6 @@ class EventBean(object):
     def get_available_users(self, event_id):
         try:
             from models import Event, User
-
-
 
             acceptedUsers = Event.query.filter_by(id=event_id).first().accepted
             rejectedUsers = Event.query.filter_by(id=event_id).first().rejected
@@ -680,13 +747,13 @@ class EventBean(object):
             availableUsers = []
             for user in allUsers:
                 new_user = {
-                    "name":user.name,
-                    "email":user.email,
-                    "pic":user.photoLink
+                    "name": user.name,
+                    "email": user.email,
+                    "pic": user.photoLink
                 }
                 availableUsers.append(new_user)
 
-            self.result =availableUsers
+            self.result = availableUsers
             return True
 
         except Exception as e:

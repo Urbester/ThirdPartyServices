@@ -148,7 +148,6 @@ def reject_user_from_event():
         return return_http_msg(400, message=bean.result)
 
 
-#################################################################
 # METHOD FOR ASKING TO JOIN PUBLIC PARTY
 @app.route('/v1/event/ask', methods=['GET'])
 def ask_to_join_party():
@@ -162,8 +161,6 @@ def ask_to_join_party():
     else:
         return return_http_msg(400, message=bean.result)
 
-
-#################################################################
 
 # GET PUBLIC EVENT LIST
 @app.route('/v1/event/list/public', methods=["GET"])
@@ -260,6 +257,21 @@ def get_invited_event_lists():
     else:
         return return_http_msg(400, message=bean.result)
 
+
+# GET UPCOMING EVENTS
+@app.route('/v1/event/list/upcoming', methods=['GET'])
+def get_upcoming_events():
+    # X-Auth-Token Needed
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_upcoming_events(user)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
 
 # GET ALL USER LISTS OF EVENT
 @app.route('/v1/event/list', methods=['GET'])
