@@ -12,7 +12,7 @@ def create_event():
     data = request.get_json()
     if not set(
             ["Title", "Description", "StartDate", "EndDate", "Local", "Price", "Public", "maxGuests", "URL"]).issubset(
-        data.keys()):
+            data.keys()):
         return return_http_msg(400,
                                message="Expected Title, StartDate, EndDate, Local, Description, Price, Public, maxGuests, URL")
     if "X-Auth-Token" not in request.headers:
