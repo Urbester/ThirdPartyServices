@@ -6,10 +6,12 @@ class EventBean(object):
             from application import db
             if URL == "":
                 event = Event(title=title, startDate=startDate, endDate=endDate,
-                              local=local, description=description, price=price, owner=owner, public=public, maxGuests=maxGuests)
+                              local=local, description=description, price=price, owner=owner, public=public,
+                              maxGuests=maxGuests)
             else:
                 event = Event(title=title, startDate=startDate, endDate=endDate,
-                              local=local, description=description, price=price, owner=owner, public=public, maxGuests=maxGuests, URL=URL)
+                              local=local, description=description, price=price, owner=owner, public=public,
+                              maxGuests=maxGuests, URL=URL)
             db.session.add(event)
             db.session.commit()
             self.result = "Event created."
@@ -19,8 +21,7 @@ class EventBean(object):
             return False
 
     # NICE TO HAVE, NOT TESTED
-    def update_event(self, id, title, startDate, endDate, local,
-                     description, price, owner):
+    def update_event(self, id, title, startDate, endDate, local, description, price, owner):
         try:
             from models import Event
             from application import db
@@ -51,12 +52,45 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_event(self, id):
+    def get_event(self, id, token):
         try:
-            from models import Event, User
+            from models import Event, User, User_Accepted_Event, User_Rejected_Event, User_InvitedTo_Event, \
+                User_Pending_Event
+
             event = Event.query.filter_by(id=id).first()
-            accepted_users = Event.query.filter_by(id=id).first().accepted
+            user = User.query.filter_by(accessToken=token).first()
+
+            isHosting = "false"
+            isAccepted = "false"
+            isPending = "false"
+            isRejected = "false"
+            isInvited = "false"
+
+            # check if is hosting the event
             host_user = User.query.filter_by(id=event.host).first()
+            if host_user.accessToken == token:
+                isHosting = "true"
+
+            # check if is in accepted list of event
+            accepted_users = Event.query.filter_by(id=id).first().accepted
+            if user in accepted_users:
+                isAccepted = "true"
+
+            # check if is pending list of event
+            pending_users = Event.query.filter_by(id=id).first().pending
+            if user in pending_users:
+                isPending = "true"
+
+            # check if is in rejected list of event
+            rejected = Event.query.filter_by(id=id).first().rejected
+            if len(rejected) > 0:
+                isRejected = "true"
+
+            # check if is invited list of event
+            invited = Event.query.filter_by(id=id).first().invited
+            if user in invited:
+                isInvited = "true"
+
             self.result = {
                 "id": event.id,
                 "title": event.title,
@@ -69,6 +103,11 @@ class EventBean(object):
                 "host_email": host_user.email,
                 "host_URL": host_user.photoLink,
                 "maxGuests": event.maxGuests,
+                "isHosting": isHosting,
+                "isPending": isPending,
+                "isInvited": isInvited,
+                "isRejected": isRejected,
+                "isAccepted": isAccepted,
                 "slotsLeft": event.maxGuests - len(accepted_users),
                 "URL": event.URL
             }
@@ -160,7 +199,38 @@ class EventBean(object):
             event_set = Event.query.filter(Event.isPublic == True, Event.host != user.id)
             event_list = []
             for event in event_set:
+
+                isHosting = "false"
+                isAccepted = "false"
+                isPending = "false"
+                isRejected = "false"
+                isInvited = "false"
+
+                # check if is hosting the event
                 host_user = User.query.filter_by(id=event.host).first()
+                if host_user.accessToken == user.accessToken:
+                    isHosting = "true"
+
+                # check if is in accepted list of event
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                if user in accepted_users:
+                    isAccepted = "true"
+
+                # check if is pending list of event
+                pending_users = Event.query.filter_by(id=event.id).first().pending
+                if user in pending_users:
+                    isPending = "true"
+
+                # check if is in rejected list of event
+                rejected = Event.query.filter_by(id=event.id).first().rejected
+                if user in rejected:
+                    isRejected = "true"
+
+                # check if is invited list of event
+                invited = Event.query.filter_by(id=event.id).first().invited
+                if user in invited:
+                    isInvited = "true"
+
                 accepted_users = Event.query.filter_by(id=event.id).first().accepted
                 event_list.append({
                     "id": event.id,
@@ -174,6 +244,11 @@ class EventBean(object):
                     "host_email": host_user.email,
                     "host_URL": host_user.photoLink,
                     "maxGuests": event.maxGuests,
+                    "isHosting": isHosting,
+                    "isPending": isPending,
+                    "isInvited": isInvited,
+                    "isRejected": isRejected,
+                    "isAccepted": isAccepted,
                     "slotsLeft": event.maxGuests - len(accepted_users),
                     "URL": event.URL
                 })
@@ -189,6 +264,37 @@ class EventBean(object):
             event_set = Event.query.filter_by(host=user.id)
             event_list = []
             for event in event_set:
+                isHosting = "false"
+                isAccepted = "false"
+                isPending = "false"
+                isRejected = "false"
+                isInvited = "false"
+
+                # check if is hosting the event
+                host_user = User.query.filter_by(id=event.host).first()
+                if host_user.accessToken == user.accessToken:
+                    isHosting = "true"
+
+                # check if is in accepted list of event
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                if user in accepted_users:
+                    isAccepted = "true"
+
+                # check if is pending list of event
+                pending_users = Event.query.filter_by(id=event.id).first().pending
+                if user in pending_users:
+                    isPending = "true"
+
+                # check if is in rejected list of event
+                rejected = Event.query.filter_by(id=event.id).first().rejected
+                if user in rejected:
+                    isRejected = "true"
+
+                # check if is invited list of event
+                invited = Event.query.filter_by(id=event.id).first().invited
+                if user in invited:
+                    isInvited = "true"
+
                 accepted_users = Event.query.filter_by(id=event.id).first().accepted
                 event_list.append({
                     "id": event.id,
@@ -198,10 +304,15 @@ class EventBean(object):
                     "local": event.local,
                     "description": event.description,
                     "price": event.price,
-                    "host_name": user.name,
-                    "host_email": user.email,
-                    "host_URL": user.photoLink,
+                    "host_name": host_user.name,
+                    "host_email": host_user.email,
+                    "host_URL": host_user.photoLink,
                     "maxGuests": event.maxGuests,
+                    "isHosting": isHosting,
+                    "isPending": isPending,
+                    "isInvited": isInvited,
+                    "isRejected": isRejected,
+                    "isAccepted": isAccepted,
                     "slotsLeft": event.maxGuests - len(accepted_users),
                     "URL": event.URL
                 })
@@ -217,6 +328,38 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().accepted
             event_list = []
             for event in event_set:
+
+                isHosting = "false"
+                isAccepted = "false"
+                isPending = "false"
+                isRejected = "false"
+                isInvited = "false"
+
+                # check if is hosting the event
+                host_user = User.query.filter_by(id=event.host).first()
+                if host_user.accessToken == user.accessToken:
+                    isHosting = "true"
+
+                # check if is in accepted list of event
+                accepted_users = Event.query.filter_by(id=id).first().accepted
+                if user in accepted_users:
+                    isAccepted = "true"
+
+                # check if is pending list of event
+                pending_users = Event.query.filter_by(id=id).first().pending
+                if user in pending_users:
+                    isPending = "true"
+
+                # check if is in rejected list of event
+                rejected = Event.query.filter_by(id=id).first().rejected
+                if user in rejected:
+                    isRejected = "true"
+
+                # check if is invited list of event
+                invited = Event.query.filter_by(id=id).first().invited
+                if user in invited:
+                    isInvited = "true"
+
                 accepted_users = Event.query.filter_by(id=event.id).first().accepted
                 event_list.append({
                     "id": event.id,
@@ -226,10 +369,15 @@ class EventBean(object):
                     "local": event.local,
                     "description": event.description,
                     "price": event.price,
-                    "host_name": user.name,
-                    "host_email": user.email,
-                    "host_URL": user.photoLink,
+                    "host_name": host_user.name,
+                    "host_email": host_user.email,
+                    "host_URL": host_user.photoLink,
                     "maxGuests": event.maxGuests,
+                    "isHosting": isHosting,
+                    "isPending": isPending,
+                    "isInvited": isInvited,
+                    "isRejected": isRejected,
+                    "isAccepted": isAccepted,
                     "slotsLeft": event.maxGuests - len(accepted_users),
                     "URL": event.URL
                 })
@@ -245,6 +393,37 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().rejected
             event_list = []
             for event in event_set:
+                isHosting = "false"
+                isAccepted = "false"
+                isPending = "false"
+                isRejected = "false"
+                isInvited = "false"
+
+                # check if is hosting the event
+                host_user = User.query.filter_by(id=event.host).first()
+                if host_user.accessToken == user.accessToken:
+                    isHosting = "true"
+
+                # check if is in accepted list of event
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                if user in accepted_users:
+                    isAccepted = "true"
+
+                # check if is pending list of event
+                pending_users = Event.query.filter_by(id=event.id).first().pending
+                if user in pending_users:
+                    isPending = "true"
+
+                # check if is in rejected list of event
+                rejected = Event.query.filter_by(id=event.id).first().rejected
+                if user in rejected:
+                    isRejected = "true"
+
+                # check if is invited list of event
+                invited = Event.query.filter_by(id=event.id).first().invited
+                if user in invited:
+                    isInvited = "true"
+
                 accepted_users = Event.query.filter_by(id=event.id).first().accepted
                 event_list.append({
                     "id": event.id,
@@ -254,10 +433,15 @@ class EventBean(object):
                     "local": event.local,
                     "description": event.description,
                     "price": event.price,
-                    "host_name": user.name,
-                    "host_email": user.email,
-                    "host_URL": user.photoLink,
+                    "host_name": host_user.name,
+                    "host_email": host_user.email,
+                    "host_URL": host_user.photoLink,
                     "maxGuests": event.maxGuests,
+                    "isHosting": isHosting,
+                    "isPending": isPending,
+                    "isInvited": isInvited,
+                    "isRejected": isRejected,
+                    "isAccepted": isAccepted,
                     "slotsLeft": event.maxGuests - len(accepted_users),
                     "URL": event.URL
                 })
@@ -273,6 +457,37 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().pending
             event_list = []
             for event in event_set:
+                isHosting = "false"
+                isAccepted = "false"
+                isPending = "false"
+                isRejected = "false"
+                isInvited = "false"
+
+                # check if is hosting the event
+                host_user = User.query.filter_by(id=event.host).first()
+                if host_user.accessToken == user.accessToken:
+                    isHosting = "true"
+
+                # check if is in accepted list of event
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                if user in accepted_users:
+                    isAccepted = "true"
+
+                # check if is pending list of event
+                pending_users = Event.query.filter_by(id=event.id).first().pending
+                if user in pending_users:
+                    isPending = "true"
+
+                # check if is in rejected list of event
+                rejected = Event.query.filter_by(id=event.id).first().rejected
+                if user in rejected:
+                    isRejected = "true"
+
+                # check if is invited list of event
+                invited = Event.query.filter_by(id=event.id).first().invited
+                if user in invited:
+                    isInvited = "true"
+
                 accepted_users = Event.query.filter_by(id=event.id).first().accepted
                 event_list.append({
                     "id": event.id,
@@ -282,10 +497,15 @@ class EventBean(object):
                     "local": event.local,
                     "description": event.description,
                     "price": event.price,
-                    "host_name": user.name,
-                    "host_email": user.email,
-                    "host_URL": user.photoLink,
+                    "host_name": host_user.name,
+                    "host_email": host_user.email,
+                    "host_URL": host_user.photoLink,
                     "maxGuests": event.maxGuests,
+                    "isHosting": isHosting,
+                    "isPending": isPending,
+                    "isInvited": isInvited,
+                    "isRejected": isRejected,
+                    "isAccepted": isAccepted,
                     "slotsLeft": event.maxGuests - len(accepted_users),
                     "URL": event.URL
                 })
@@ -301,6 +521,37 @@ class EventBean(object):
             event_set = User.query.filter_by(id=user.id).first().invited
             event_list = []
             for event in event_set:
+                isHosting = "false"
+                isAccepted = "false"
+                isPending = "false"
+                isRejected = "false"
+                isInvited = "false"
+
+                # check if is hosting the event
+                host_user = User.query.filter_by(id=event.host).first()
+                if host_user.accessToken == user.accessToken:
+                    isHosting = "true"
+
+                # check if is in accepted list of event
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
+                if user in accepted_users:
+                    isAccepted = "true"
+
+                # check if is pending list of event
+                pending_users = Event.query.filter_by(id=event.id).first().pending
+                if user in pending_users:
+                    isPending = "true"
+
+                # check if is in rejected list of event
+                rejected = Event.query.filter_by(id=event.id).first().rejected
+                if user in rejected:
+                    isRejected = "true"
+
+                # check if is invited list of event
+                invited = Event.query.filter_by(id=event.id).first().invited
+                if user in invited:
+                    isInvited = "true"
+
                 accepted_users = Event.query.filter_by(id=event.id).first().accepted
                 event_list.append({
                     "id": event.id,
@@ -310,10 +561,15 @@ class EventBean(object):
                     "local": event.local,
                     "description": event.description,
                     "price": event.price,
-                    "host_name": user.name,
-                    "host_email": user.email,
-                    "host_URL": user.photoLink,
+                    "host_name": host_user.name,
+                    "host_email": host_user.email,
+                    "host_URL": host_user.photoLink,
                     "maxGuests": event.maxGuests,
+                    "isHosting": isHosting,
+                    "isPending": isPending,
+                    "isInvited": isInvited,
+                    "isRejected": isRejected,
+                    "isAccepted": isAccepted,
                     "slotsLeft": event.maxGuests - len(accepted_users),
                     "URL": event.URL
                 })
