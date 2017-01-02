@@ -7,6 +7,7 @@ from models import User, Event
 from lib.utils import return_http_msg
 
 
+# METHOD FOR CREATING EVENT
 @app.route('/v1/event', methods=["POST"])
 def create_event():
     data = request.get_json()
@@ -44,6 +45,7 @@ def create_event():
         return return_http_msg(400, message=bean.result)
 
 
+# METHOD TO RETRIEVE INFORMATION ABOUT EVENT
 @app.route('/v1/event', methods=["GET"])
 def get_event():
     # X-Auth-Token Needed
@@ -57,6 +59,7 @@ def get_event():
         return return_http_msg(400, message=bean.result)
 
 
+# METHOD FOR HOST TO DELETE AN EVENT
 @app.route('/v1/event', methods=["DELETE"])
 def delete_event():
     # X-Auth-Token Needed
@@ -102,6 +105,7 @@ def accept_event():
         return return_http_msg(400, message=bean.result)
 
 
+# METHOD FOR USER TO REJECT AN INVITATION
 @app.route('/v1/event/reject', methods=['GET'])
 def reject_event():
     event_id = request.args.get('id')
@@ -115,7 +119,6 @@ def reject_event():
         return return_http_msg(400, message=bean.result)
 
 
-#################################################################
 # METHOD FOR OWNER TO INVITE USERS
 @app.route('/v1/event/invite', methods=['POST'])
 def invite_to_event():
@@ -273,9 +276,10 @@ def get_upcoming_events():
     else:
         return return_http_msg(400, message=bean.result)
 
+
 # GET ALL USER LISTS OF EVENT
 @app.route('/v1/event/list', methods=['GET'])
-def get_invited_users():
+def get_users_list():
     # X-Auth-Token Needed
     event_id = request.args.get('id')
     if "X-Auth-Token" not in request.headers:
