@@ -1,5 +1,4 @@
 class AccountBean(object):
-
     def __init__(self):
         pass
 
