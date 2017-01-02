@@ -1,5 +1,5 @@
 class EventBean(object):
-    def new_event(self, title, startDate, endDate, local, description, price, owner, public, maxGuests, URL):
+    def new_event(self, title, startDate, endDate, local, description, price, owner, public, maxGuests, URL):  #
         try:
             from models import Event
             from models import User
@@ -21,7 +21,7 @@ class EventBean(object):
             return False
 
     # NICE TO HAVE, NOT TESTED
-    def update_event(self, id, title, startDate, endDate, local, description, price, owner):
+    def update_event(self, id, title, startDate, endDate, local, description, price, owner):  #
         try:
             from models import Event
             from application import db
@@ -39,7 +39,7 @@ class EventBean(object):
             self.result = "Update Error"
             return False
 
-    def delete_event(self, id, host):
+    def delete_event(self, id, host):  #
         try:
             from models import Event
             from application import db
@@ -52,7 +52,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_event(self, id, token):
+    def get_event(self, id, token):  #
         try:
             from models import Event, User, User_Accepted_Event, User_Rejected_Event, User_InvitedTo_Event, \
                 User_Pending_Event
@@ -116,20 +116,13 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def accept_event(self, event_id, user):
+    def accept_event(self, event_id, user):  #
         try:
             from models import User, Event
             from application import db
             event = Event.query.filter_by(id=event_id).first()
             event.accepted.append(user)
-            try:
-                event.invited.remove(user)
-            except Exception as e:
-                try:
-                    event.pending.remove(user)
-                except:
-                    self.result = "ERROR"
-
+            event.invited.remove(user)
             db.session.commit()
             self.result = "Accepted Event"
             return True
@@ -137,11 +130,12 @@ class EventBean(object):
             self.result = "ERROR"
             return False
 
-    def reject_event(self, event_id, user):
+    def reject_event(self, event_id, user):  #
         try:
             from models import User, Event
             from application import db
             event = Event.query.filter_by(id=event_id).first()
+            event.invited.remove(user)
             event.rejected.append(user)
             db.session.commit()
             self.result = "Rejected Event"
@@ -150,7 +144,7 @@ class EventBean(object):
             self.result = "ERROR"
             return False
 
-    def invite_users(self, user_email, event_id, owner):
+    def invite_users(self, user_email, event_id, owner):  #
         try:
             from models import User, Event
             from application import db
@@ -163,7 +157,7 @@ class EventBean(object):
             self.result = "ERROR"
             return False
 
-    def accept_pending(self, user_email, event_id, owner):
+    def accept_pending(self, user_email, event_id, owner):  #
         try:
             from models import User, Event
             from application import db
@@ -178,7 +172,7 @@ class EventBean(object):
             self.result = "ERROR accepting user, check if owner"
             return False
 
-    def reject_pending(self, user_email, event_id, owner):
+    def reject_pending(self, user_email, event_id, owner):  #
         try:
             from models import User, Event
             from application import db
@@ -193,22 +187,7 @@ class EventBean(object):
             self.result = "ERROR accepting user, check if owner"
             return False
 
-    def reject_user_from_event(self, invite_list, event_id, owner):
-        try:
-            from models import User, Event
-            from application import db
-            event = Event.query.filter_by(id=event_id, host=owner.id).first()
-            for i in invite_list:
-                if User.query.filter_by(email=invite_list[i]).first() is not None:
-                    event.rejected.append(User.query.filter_by(email=invite_list[i]).first())
-            db.session.commit()
-            self.result = "Rejected User"
-            return True
-        except Exception as exception:
-            self.result = "ERROR"
-            return False
-
-    def ask_to_join_event(self, event_id, owner):
+    def ask_to_join_event(self, event_id, owner):  #
         try:
             from models import User, Event
             from application import db
@@ -221,7 +200,7 @@ class EventBean(object):
             self.result = "ERROR"
             return False
 
-    def get_event_list(self, user):
+    def get_event_list(self, user):  #
         try:
             from models import Event, User
             event_set = Event.query.filter(Event.isPublic == True, Event.host != user.id)
@@ -286,7 +265,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_hosting_event_list(self, user):
+    def get_hosting_event_list(self, user):  #
         try:
             from models import Event, User
             event_set = Event.query.filter_by(host=user.id)
@@ -350,7 +329,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_accepted_event_list(self, user):
+    def get_accepted_event_list(self, user):  #
         try:
             from models import Event, User
             event_set = User.query.filter_by(id=user.id).first().accepted
@@ -415,7 +394,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_rejected_event_list(self, user):
+    def get_rejected_event_list(self, user):  #
         try:
             from models import Event, User
             event_set = User.query.filter_by(id=user.id).first().rejected
@@ -479,7 +458,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_pending_event_list(self, user):
+    def get_pending_event_list(self, user):  #
         try:
             from models import Event, User
             event_set = User.query.filter_by(id=user.id).first().pending
@@ -543,7 +522,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_invited_event_list(self, user):
+    def get_invited_event_list(self, user):  #
         try:
             from models import Event, User
             event_set = User.query.filter_by(id=user.id).first().invited
@@ -607,7 +586,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_upcoming_events(self, user):
+    def get_upcoming_events(self, user):  #
         try:
             from models import Event, User
             from datetime import datetime
@@ -676,7 +655,7 @@ class EventBean(object):
             self.result = "Event doesn't exist."
             return False
 
-    def get_user_lists(self, event_id):
+    def get_user_lists(self, event_id):  #
         try:
             from models import Event, User
 
@@ -736,7 +715,7 @@ class EventBean(object):
             self.result = "ERROR getting lists"
             return False
 
-    def get_available_users(self, event_id):
+    def get_available_users(self, event_id):  #
         try:
             from models import Event, User
 
@@ -783,7 +762,6 @@ class EventBean(object):
 
             self.result = availableUsers
             return True
-
         except Exception as e:
             self.result = "ERROR getting available users"
             return False

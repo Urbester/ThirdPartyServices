@@ -6,9 +6,10 @@ from beans import EventBean
 from models import User, Event
 from lib.utils import return_http_msg
 
-    ###########################
-    # EVENT CREATION/DELETION #
-    ###########################
+
+###########################
+# EVENT CREATION/DELETION #
+###########################
 
 # METHOD FOR CREATING EVENT
 @app.route('/v1/event', methods=["POST"])
@@ -97,7 +98,8 @@ def update_event():
         # MANAGING SLOTS #
         ##################
 
-# USER METHODS FOR ACCEPTING/REJECTING INVITES TO PRIVATE PARTIES
+
+# USER METHODS FOR ACCEPTING AN INVITE
 @app.route('/v1/event/accept', methods=['GET'])
 def accept_event():
     event_id = request.args.get('id')
@@ -164,8 +166,8 @@ def invite_to_event():
         return return_http_msg(400, message="X-Auth-Token required.")
     owner = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
     data = request.get_json()
-    user_email = data["user_email"]
-    event_id = data["event_id"]
+    user_email = data["Email"]
+    event_id = data["Id"]
     bean = EventBean()
     if bean.invite_users(user_email, event_id, owner):
         return return_http_msg(200, message=bean.result)
