@@ -261,8 +261,6 @@ def get_invited_event_lists():
         return return_http_msg(400, message=bean.result)
 
 
-#####################################################
-
 # GET ALL USER LISTS OF EVENT
 @app.route('/v1/event/list', methods=['GET'])
 def get_invited_users():
@@ -274,6 +272,22 @@ def get_invited_users():
     if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
         event = EventBean()
         event.get_user_lists(event_id)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
+# GET ALL AVAILABLE USERS FOR EVENT
+@app.route('/v1/event/available', methods=['GET'])
+def det_available_users():
+    # X-Auth-Token Needed
+    event_id = request.args.get('id')
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        event.get_available_users(event_id)
         return return_http_msg(200, message=event.result)
     else:
         return return_http_msg(400, message=bean.result)
