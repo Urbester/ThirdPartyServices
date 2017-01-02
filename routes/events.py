@@ -17,6 +17,7 @@ def create_event():
                                message="Expected Title, StartDate, EndDate, Local, Description, Price, Public, maxGuests, URL")
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
+
     owner = AccountBean()
     if not owner.get_account(request.headers["X-Auth-Token"]):
         return return_http_msg(400, message="Invalid AccessToken")
