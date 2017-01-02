@@ -17,6 +17,7 @@ def create_event():
                                message="Expected Title, StartDate, EndDate, Local, Description, Price, Public, maxGuests, URL")
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
+
     owner = AccountBean()
     if not owner.get_account(request.headers["X-Auth-Token"]):
         return return_http_msg(400, message="Invalid AccessToken")
@@ -258,6 +259,25 @@ def get_invited_event_lists():
         event = EventBean()
         user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
         event.get_invited_event_list(user)
+        return return_http_msg(200, message=event.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
+#####################################################
+
+# GET ALL USER LISTS OF EVENT
+@app.route('/v1/event/list', methods=['GET'])
+def get_invited_users():
+    # X-Auth-Token Needed
+    event_id = request.args.get('id')
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    bean = AccountBean()
+    if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
+        event = EventBean()
+        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
+        event.get_user_lists(event_id)
         return return_http_msg(200, message=event.result)
     else:
         return return_http_msg(400, message=bean.result)
