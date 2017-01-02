@@ -638,3 +638,57 @@ class EventBean(object):
         except Exception as exception:
             self.result = "ERROR getting lists"
             return False
+
+    def get_available_users(self, event_id):
+        try:
+            from models import Event, User
+
+
+
+            acceptedUsers = Event.query.filter_by(id=event_id).first().accepted
+            rejectedUsers = Event.query.filter_by(id=event_id).first().rejected
+            invitedUsers = Event.query.filter_by(id=event_id).first().invited
+            pendingUsers = Event.query.filter_by(id=event_id).first().pending
+
+            allUsers = User.query.all()
+
+            toDelete = []
+
+            for i in range(len(acceptedUsers)):
+                for j in range(len(allUsers)):
+                    if acceptedUsers[i].id == allUsers[j].id:
+                        toDelete.append(j)
+
+            for i in range(len(rejectedUsers)):
+                for j in range(len(allUsers)):
+                    if rejectedUsers[i].id == allUsers[j].id:
+                        toDelete.append(j)
+
+            for i in range(len(invitedUsers)):
+                for j in range(len(allUsers)):
+                    if invitedUsers[i].id == allUsers[j].id:
+                        toDelete.append(j)
+
+            for i in range(len(pendingUsers)):
+                for j in range(len(allUsers)):
+                    if pendingUsers[i].id == allUsers[j].id:
+                        toDelete.append(j)
+
+            for i in list(set(toDelete)):
+                allUsers.pop(i)
+
+            availableUsers = []
+            for user in allUsers:
+                new_user = {
+                    "name":user.name,
+                    "email":user.email,
+                    "pic":user.photoLink
+                }
+                availableUsers.append(new_user)
+
+            self.result =availableUsers
+            return True
+
+        except Exception as e:
+            self.result = "ERROR getting available users"
+            return False
