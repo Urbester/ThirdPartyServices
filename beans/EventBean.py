@@ -150,19 +150,47 @@ class EventBean(object):
             self.result = "ERROR"
             return False
 
-    def invite_users(self, invite_list, event_id, owner):
+    def invite_users(self, user_email, event_id, owner):
         try:
             from models import User, Event
             from application import db
             event = Event.query.filter_by(id=event_id, host=owner.id).first()
-            for i in invite_list:
-                if User.query.filter_by(email=i).first() is not None:
-                    event.invited.append(User.query.filter_by(email=i).first())
+            event.invited.append(User.query.filter_by(email=user_email).first())
             db.session.commit()
             self.result = "Invited User"
             return True
         except Exception as exception:
             self.result = "ERROR"
+            return False
+
+    def accept_pending(self, user_email, event_id, owner):
+        try:
+            from models import User, Event
+            from application import db
+            event = Event.query.filter_by(id=event_id, host=owner.id).first()
+            user = User.query.filter_by(email=user_email).first()
+            event.pending.remove(user)
+            event.accepted.append(user)
+            db.session.commit()
+            self.result = "User accepted"
+            return True
+        except Exception as e:
+            self.result = "ERROR accepting user, check if owner"
+            return False
+
+    def reject_pending(self, user_email, event_id, owner):
+        try:
+            from models import User, Event
+            from application import db
+            event = Event.query.filter_by(id=event_id, host=owner.id).first()
+            user = User.query.filter_by(email=user_email).first()
+            event.pending.remove(user)
+            event.rejected.append(user)
+            db.session.commit()
+            self.result = "User accepted"
+            return True
+        except Exception as e:
+            self.result = "ERROR accepting user, check if owner"
             return False
 
     def reject_user_from_event(self, invite_list, event_id, owner):
