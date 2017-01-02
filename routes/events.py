@@ -12,7 +12,7 @@ def create_event():
     data = request.get_json()
     if not set(
             ["Title", "Description", "StartDate", "EndDate", "Local", "Price", "Public", "MaxGuests", "URL"]).issubset(
-            data.keys()):
+        data.keys()):
         return return_http_msg(400,
                                message="Expected Title, StartDate, EndDate, Local, Description, Price, Public, maxGuests, URL")
     if "X-Auth-Token" not in request.headers:
@@ -27,9 +27,6 @@ def create_event():
         data["Public"] = True
     else:
         data["Public"] = False
-
-
-
 
     host = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
     if bean.new_event(data["Title"],
@@ -276,7 +273,6 @@ def get_invited_users():
     bean = AccountBean()
     if bean.get_account(accessToken=request.headers["X-Auth-Token"]):
         event = EventBean()
-        user = User.query.filter_by(accessToken=bean.result["accessToken"]).first()
         event.get_user_lists(event_id)
         return return_http_msg(200, message=event.result)
     else:

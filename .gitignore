@@ -7,7 +7,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+.idea/
 # Distribution / packaging
 .Python
 env/
@@ -90,3 +90,4 @@ ENV/
 # Rope project settings
 .ropeproject
 
+.idea/workspace.xml
