@@ -53,7 +53,7 @@ def get_event():
         return return_http_msg(400, message="X-Auth-Token required.")
     bean = EventBean()
     event_id = request.args.get('id')
-    if bean.get_event(id=event_id):
+    if bean.get_event(id=event_id, token=request.headers["X-Auth-Token"]):
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
@@ -185,7 +185,7 @@ def get_event_lists():
 
 # GET HOSTING EVENTS
 @app.route('/v1/event/list/hosting', methods=['GET'])
-def get_hostting_event_lists():
+def get_hosting_event_lists():
     # X-Auth-Token Needed
     if "X-Auth-Token" not in request.headers:
         return return_http_msg(400, message="X-Auth-Token required.")
