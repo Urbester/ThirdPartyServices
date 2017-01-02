@@ -6,6 +6,9 @@ from beans import EventBean
 from models import User, Event
 from lib.utils import return_http_msg
 
+    ###########################
+    # EVENT CREATION/DELETION #
+    ###########################
 
 # METHOD FOR CREATING EVENT
 @app.route('/v1/event', methods=["POST"])
@@ -90,6 +93,9 @@ def update_event():
     else:
         return return_http_msg(400, message=bean.result)
 
+        ##################
+        # MANAGING SLOTS #
+        ##################
 
 # USER METHODS FOR ACCEPTING/REJECTING INVITES TO PRIVATE PARTIES
 @app.route('/v1/event/accept', methods=['GET'])
@@ -119,6 +125,38 @@ def reject_event():
         return return_http_msg(400, message=bean.result)
 
 
+# METHOD FOR OWNER TO ACCEPT PENDING USERS
+@app.route('/v1/event/list/pending', methods=['POST'])
+def accept_pending_user():
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    data = request.get_json()
+    event_id = data["Id"]
+    user_email = data["Email"]
+    owner = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
+    bean = EventBean()
+    if bean.accept_pending(user_email, event_id, owner):
+        return return_http_msg(200, message=bean.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
+# METHOD FOR OWNER TO REJECT PENDING USERS
+@app.route('/v1/event/list/pending', methods=['DELETE'])
+def reject_pending_user():
+    if "X-Auth-Token" not in request.headers:
+        return return_http_msg(400, message="X-Auth-Token required.")
+    data = request.get_json()
+    event_id = data["Id"]
+    user_email = data["Email"]
+    owner = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
+    bean = EventBean()
+    if bean.reject_pending(user_email, event_id, owner):
+        return return_http_msg(200, message=bean.result)
+    else:
+        return return_http_msg(400, message=bean.result)
+
+
 # METHOD FOR OWNER TO INVITE USERS
 @app.route('/v1/event/invite', methods=['POST'])
 def invite_to_event():
@@ -126,26 +164,10 @@ def invite_to_event():
         return return_http_msg(400, message="X-Auth-Token required.")
     owner = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
     data = request.get_json()
-    invite_list = data["list"]
+    user_email = data["user_email"]
     event_id = data["event_id"]
     bean = EventBean()
-    if bean.invite_users(invite_list, event_id, owner):
-        return return_http_msg(200, message=bean.result)
-    else:
-        return return_http_msg(400, message=bean.result)
-
-
-# METHOD FOR OWNER TO REJECT PENDING USERS
-@app.route('/v1/event/reject', methods=['POST'])
-def reject_user_from_event():
-    if "X-Auth-Token" not in request.headers:
-        return return_http_msg(400, message="X-Auth-Token required.")
-    owner = User.query.filter_by(accessToken=request.headers["X-Auth-Token"]).first()
-    data = request.get_json()
-    invite_list = data["list"]
-    event_id = data["event_id"]
-    bean = EventBean()
-    if bean.reject_user_from_event(invite_list, event_id, owner):
+    if bean.invite_users(user_email, event_id, owner):
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
@@ -163,6 +185,11 @@ def ask_to_join_party():
         return return_http_msg(200, message=bean.result)
     else:
         return return_http_msg(400, message=bean.result)
+
+
+        ###############
+        # EVENT LISTS #
+        ###############
 
 
 # GET PUBLIC EVENT LIST
@@ -275,6 +302,10 @@ def get_upcoming_events():
         return return_http_msg(200, message=event.result)
     else:
         return return_http_msg(400, message=bean.result)
+
+        ###############
+        # USERS LISTS #
+        ###############
 
 
 # GET ALL USER LISTS OF EVENT
