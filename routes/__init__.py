@@ -2,7 +2,7 @@
 from accounts import *
 from events import *
 
-@app.route('/v1/', methods=["DELETE"])
+@app.route('/v1/', methods=["GET"])
 def status():
     print request.data
     print "---------------------"
