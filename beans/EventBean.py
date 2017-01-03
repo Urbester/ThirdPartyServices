@@ -196,6 +196,7 @@ class EventBean(object):
             db.session.commit()
             self.result = "Asked to event"
             return True
+
         except Exception as exception:
             self.result = "ERROR"
             return False
@@ -348,22 +349,22 @@ class EventBean(object):
                     isHosting = "true"
 
                 # check if is in accepted list of event
-                accepted_users = Event.query.filter_by(id=id).first().accepted
+                accepted_users = Event.query.filter_by(id=event.id).first().accepted
                 if user in accepted_users:
                     isAccepted = "true"
 
                 # check if is pending list of event
-                pending_users = Event.query.filter_by(id=id).first().pending
+                pending_users = Event.query.filter_by(id=event.id).first().pending
                 if user in pending_users:
                     isPending = "true"
 
                 # check if is in rejected list of event
-                rejected = Event.query.filter_by(id=id).first().rejected
+                rejected = Event.query.filter_by(id=event.id).first().rejected
                 if user in rejected:
                     isRejected = "true"
 
                 # check if is invited list of event
-                invited = Event.query.filter_by(id=id).first().invited
+                invited = Event.query.filter_by(id=event.id).first().invited
                 if user in invited:
                     isInvited = "true"
 
