@@ -724,6 +724,8 @@ class EventBean(object):
             rejectedUsers = Event.query.filter_by(id=event_id).first().rejected
             invitedUsers = Event.query.filter_by(id=event_id).first().invited
             pendingUsers = Event.query.filter_by(id=event_id).first().pending
+            host_id = Event.query.filter_by(id=event_id).first().host
+            host = User.query.filter_by(id=host_id).first()
 
             allUsers = User.query.all()
 
@@ -748,6 +750,10 @@ class EventBean(object):
                 for j in range(len(allUsers)):
                     if pendingUsers[i].id == allUsers[j].id:
                         toDelete.append(j)
+
+            for i in range(len(allUsers)):
+                if allUsers[i].id == host.id:
+                    toDelete.append(i)
 
             for i in list(set(toDelete)):
                 allUsers.pop(i)
